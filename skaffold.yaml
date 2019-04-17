@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/jx-dev-org-mikec/bdd-ph-1555516064:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/jx-dev-org-mikec/bdd-ph-1555516064:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: bdd-ph-1555516064
+        chartPath: charts/bdd-ph-1555516064
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/jx-dev-org-mikec/bdd-ph-1555516064'
+          image.tag: '{{.DIGEST_HEX}}'
